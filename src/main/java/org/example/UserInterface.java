@@ -45,11 +45,11 @@ public class UserInterface {
                 case 7  -> processGetAllVehiclesRequest();
                 case 8  -> processAddVehicleRequest();
                 case 9  -> processRemoveVehicleRequest();
-                case 99 -> System.out.println("\nThank you for using the Dealership App. Goodbye!");
+                case 0 -> System.out.println("\nThank you for using the Dealership App. Goodbye!");
                 default -> System.out.println("Invalid option. Please try again.");
             }
 
-        } while (choice != 99);
+        } while (choice != 0);
     }
 
     private void printMenu() {
@@ -65,7 +65,7 @@ public class UserInterface {
         System.out.println("  7  - List ALL vehicles");
         System.out.println("  8  - Add a vehicle");
         System.out.println("  9  - Remove a vehicle");
-        System.out.println(" 99  - Quit");
+        System.out.println("  0  - Quit");
         System.out.println("========================================");
     }
 

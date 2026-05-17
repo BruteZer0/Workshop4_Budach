@@ -45,6 +45,7 @@ public class UserInterface {
                 case 7  -> processGetAllVehiclesRequest();
                 case 8  -> processAddVehicleRequest();
                 case 9  -> processRemoveVehicleRequest();
+                case 10 -> processSellLeaseVehicleRequest();
                 case 0 -> System.out.println("\nThank you for using the Dealership App. Goodbye!");
                 default -> System.out.println("Invalid option. Please try again.");
             }
@@ -65,8 +66,56 @@ public class UserInterface {
         System.out.println("  7  - List ALL vehicles");
         System.out.println("  8  - Add a vehicle");
         System.out.println("  9  - Remove a vehicle");
+        System.out.println("  10  - Vehicle to sell/lease");
         System.out.println("  0  - Quit");
         System.out.println("========================================");
+    }
+
+    public void processSellLeaseVehicleRequest() {
+        int vin = readInt("Enter VIN of vehicle to sell/lease: ");
+
+        Vehicle vehicle = null;
+        for (Vehicle v : dealership.getAllVehicles()) {
+            if (v.getVin() == vin) {
+                vehicle = v;
+                break;
+            }
+        }
+        if (vehicle == null) {
+            System.out.println("Vehicle not found.");
+            return;
+        }
+
+        String date = readString("Enter date (YYYYMMDD): ");
+        String name = readString("Enter customer name: ");
+        String email = readString("Enter customer email: ");
+
+        String type = readString("Enter contract type (SALE/LEASE): ");
+
+        Contract contract;
+
+        if (type.equalsIgnoreCase("LEASE")) {
+            int currentYear = java.time.Year.now().getValue();
+            if (currentYear - vehicle.getYear() > 3) {
+                System.out.println("Cannot lease a vehicle over 3 years old.");
+                return;
+            }
+            contract = new LeaseContract(date, name, email, vehicle);
+
+        } else {
+            String financeAnswer = readString("Would you like to finance? (YES/NO): ");
+            boolean finance = financeAnswer.equalsIgnoreCase("YES");
+            contract = new SalesContract(date, name, email, vehicle, finance);
+        }
+
+        ContractFileManager cfm = new ContractFileManager();
+        cfm.saveContract(contract);
+
+        dealership.removeVehicle(vehicle);
+        new DealershipFileManager().saveDealership(dealership);
+
+        System.out.printf("Contract complete! Total: $%.2f | Monthly: $%.2f%n",
+                contract.getTotalPrice(), contract.getMonthlyPayment());
     }
 
     private void displayVehicles(List<Vehicle> vehicles) {
